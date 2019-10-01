@@ -39,7 +39,7 @@ static void map_col_major(A2Methods_UArray2 uarray2,
 }
 
 struct small_closure {
-  A2Methods_smallapplyfun *apply; 
+  A2Methods_smallapplyfun *apply;
   void                    *cl;
 };
 
@@ -70,7 +70,7 @@ static void small_map_col_major(A2Methods_UArray2        a2,
 }
 
 
-static struct A2Methods_T uarray2_methods_blocked_struct = {
+static struct A2Methods_T uarray2_methods_plain_struct = {
   new,
   new_with_blocksize,
   /* ... other functions follow in order,
@@ -80,4 +80,4 @@ static struct A2Methods_T uarray2_methods_blocked_struct = {
 
 // finally the payoff: here is the exported pointer to the struct
 
-A2Methods_T uarray2_methods_blocked = &uarray2_methods_blocked_struct;
+A2Methods_T uarray2_methods_blocked = &uarray2_methods_plain_struct;
