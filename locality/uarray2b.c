@@ -10,6 +10,7 @@
 
 #include "uarray2b.h"
 #include "uarray.h"
+#include "coordinates.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -19,10 +20,6 @@ static const int KILOBYTE = 1024;
 struct UArray2b_T {
         int width, height, blocksize, elem_size, real_width, real_height;
         UArray_T array;
-};
-
-struct Coordinates { /* used by the private function coords_1D_to_2D */
-        int col, row;
 };
 
         /* Private function prototypes */
@@ -71,8 +68,6 @@ extern UArray2b_T UArray2b_new_64K_block(int w, int h, int size)
         aux->real_height = h + (aux->blocksize - (h % aux->blocksize));
 
         aux->array     = UArray_new(aux->real_width * aux->real_height, size);
-
-        fprintf(stderr, "%d\n", aux->blocksize);
 
         return aux;
 }

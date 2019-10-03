@@ -3,6 +3,7 @@
 #define T UArray2_T
 typedef struct T *T;
 
+/* What are these here for? do we need to do anything? */
 typedef void UArray2_applyfun(int i, int j, T array2, void *elem, void *cl);
 typedef void UArray2_mapfun(T array2, UArray2_applyfun apply, void *cl);
 

@@ -118,7 +118,7 @@ static struct A2Methods_T uarray2_methods_plain_struct = {
 	height,
 	size,
 	blocksize,
-	at,/* TODO */
+	at,
 	map_row_major,
 	map_col_major,
 	NULL,                   /* map_block_major, */
