@@ -13,7 +13,7 @@
 static A2Methods_T methods;
 typedef A2Methods_UArray2 A2;
 
-static void check_and_increment(int i, int j, A2 a, void *elem, void *cl) 
+static void check_and_increment(int i, int j, A2 a, void *elem, void *cl)
 {
         (void)i;
         (void)j;
@@ -39,7 +39,7 @@ static void double_row_major_plus()
         /* store increasing integers in row-major order */
         A2 array = methods->new_with_blocksize(W, H, sizeof(int), BS);
         int counter = 1;
-        for (int j = 0; j < H; j++) { 
+        for (int j = 0; j < H; j++) {
                 for (int i = 0; i < W; i++) { /* col index varies faster */
                         int *p = methods->at(array, i, j);
                         *p = counter++;
@@ -67,7 +67,7 @@ static void double_row_major_plus()
 }
 
 #if 0
-static void show(int i, int j, A2 a, void *elem, void *cl) 
+static void show(int i, int j, A2 a, void *elem, void *cl)
 {
         (void)a; (void)cl;
         printf("A[%02d][%02d] == %05u -- should be %05d\n",
@@ -75,7 +75,7 @@ static void show(int i, int j, A2 a, void *elem, void *cl)
 }
 #endif
 
-static inline void check(A2 a, int i, int j, unsigned n) 
+static inline void check(A2 a, int i, int j, unsigned n)
 {
         unsigned *p = methods->at(a, i, j);
         assert(*p == n);
@@ -88,39 +88,39 @@ bool has_minimum_methods(A2Methods_T m)
                 && m->size != NULL && m->blocksize != NULL && m->at != NULL;
 }
 
-bool has_small_plain_methods(A2Methods_T m) 
+bool has_small_plain_methods(A2Methods_T m)
 {
         return m->small_map_default != NULL
                 && m->small_map_row_major != NULL
                 && m->small_map_col_major != NULL;
 }
 
-bool has_plain_methods(A2Methods_T m) 
+bool has_plain_methods(A2Methods_T m)
 {
         return m->map_default != NULL
                 && m->map_row_major != NULL
                 && m->map_col_major != NULL;
 }
 
-bool has_small_blocked_methods(A2Methods_T m) 
+bool has_small_blocked_methods(A2Methods_T m)
 {
         return m->small_map_default != NULL
                 && m->small_map_block_major != NULL;
 }
 
-bool has_blocked_methods(A2Methods_T m) 
+bool has_blocked_methods(A2Methods_T m)
 {
         return m->map_default != NULL && m->map_block_major != NULL;
 }
 
 static inline void copy_unsigned(A2Methods_T methods, A2 a,
-                                 int i, int j, unsigned n) 
+                                 int i, int j, unsigned n)
 {
         unsigned *p = methods->at(a, i, j);
         *p = n;
 }
 
-static void test_methods(A2Methods_T methods_under_test) 
+static void test_methods(A2Methods_T methods_under_test)
 {
         methods = methods_under_test;
         assert(methods);
@@ -172,4 +172,3 @@ int main(int argc, char *argv[])
                                */
         return 0;
 }
-

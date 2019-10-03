@@ -11,21 +11,24 @@
 #include "uarray2b.h"
 #include "uarray.h"
 #include <stdlib.h>
-#include "stdio.h"
+#include <stdio.h>
+#include <math.h>
+
+static const int KILOBYTE = 1024;
 
 struct UArray2b_T {
         int width, height, blocksize, elem_size, real_width, real_height;
         UArray_T array;
 };
 
-struct Coordinates {
+struct Coordinates { /* used by the private function coords_1D_to_2D */
         int col, row;
 };
 
         /* Private function prototypes */
-//int coords_2D_to_1D(UArray2b_T arr, int col, int row);
-//struct Coordinates coords_1D_to_2D(UArray2b_T arr, int i);
-                                                /* ONLY FOR USE BY MAP FUNC */
+int coords_2D_to_1D(UArray2b_T arr, int col, int row);
+struct Coordinates coords_1D_to_2D(UArray2b_T arr, int i);
+
 
 /*
  * new blocked 2d array
@@ -41,8 +44,8 @@ extern UArray2b_T UArray2b_new (int w, int h, int size, int blocksize)
         aux->elem_size = size;
         aux->blocksize = blocksize;
 
-        aux->real_width  = w + (blocksize - (w % blocksize));
-        aux->real_height = h + (blocksize - (h % blocksize));
+        aux->real_width  = w + (aux->blocksize - (w % aux->blocksize));
+        aux->real_height = h + (aux->blocksize - (h % aux->blocksize));
         aux->array     = UArray_new(aux->real_width * aux->real_height, size);
 
         return aux;
@@ -53,12 +56,23 @@ extern UArray2b_T UArray2b_new (int w, int h, int size, int blocksize)
  */
 extern UArray2b_T UArray2b_new_64K_block(int w, int h, int size)
 {
-        UArray2b_T aux = malloc(sizeof(UArray2b_T));
+        UArray2b_T aux = malloc(sizeof(struct UArray2b_T));
+        int blocksize_sq = KILOBYTE / size;
+
         aux->width     = w;
         aux->height    = h;
         aux->elem_size = size;
-        aux->blocksize = 4; /* TO-DO: Make the blocksize correct */
-        aux->array     = UArray_new(w * h, size);
+        aux->blocksize = sqrt(blocksize_sq);
+
+        if (aux->blocksize < 1) { /* in case one elem is over 64KB */
+                aux->blocksize = 1;
+        }
+        aux->real_width  = w + (aux->blocksize - (w % aux->blocksize));
+        aux->real_height = h + (aux->blocksize - (h % aux->blocksize));
+
+        aux->array     = UArray_new(aux->real_width * aux->real_height, size);
+
+        fprintf(stderr, "%d\n", aux->blocksize);
 
         return aux;
 }
@@ -92,14 +106,20 @@ extern int UArray2b_blocksize(UArray2b_T array2b)
 
 /* return a pointer to the cell in the given column and row.
  * index out of range is a checked run-time error
+ *
+ * Note: can be used to check if coordinates are valid. Returns a NULL
+ *      pointer if coordinates are not valid. Therefore, expects that the
+ *      array does not store any null pointers.
  */
 extern void *UArray2b_at(UArray2b_T array2b, int col, int row)
 {
-        (void) array2b;
-        (void) col;
-        (void) row;
-        return NULL;
-//        return UArray_at(array2b->array, convert_coords(array2b, col, row));
+        if (coords_2D_to_1D(array2b, col, row) == -1) {
+                return NULL;
+        }
+        else {
+                return UArray_at(array2b->array, coords_2D_to_1D(array2b,
+                                                                col, row));
+        }
 }
 
 /* visits every cell in one block before moving to another block */
@@ -107,9 +127,15 @@ extern void  UArray2b_map(UArray2b_T array2b,
                           void apply(int col, int row, UArray2b_T array2b,
                                      void *elem, void *cl), void *cl)
 {
-        (void) array2b;
-        (void) apply;
-        (void) cl;
+        struct Coordinates coords;
+        for (int i = 0; i < array2b->real_width * array2b->real_height; i++) {
+                coords = coords_1D_to_2D(array2b, i);
+                if (coords.col != -1 && coords.row != -1) {
+                        apply(coords.col, coords.row, array2b,
+                              UArray2b_at(array2b, coords.col, coords.row),
+                              cl);
+                }
+        }
 }
 
 
@@ -138,11 +164,11 @@ int coords_2D_to_1D(UArray2b_T arr, int col, int row)
 
 /* Note: Can be used to check if a coordinate is valid. Returns {-1, -1} if
  * coordinate is invalid. */
-void coords_1D_to_2D(UArray2b_T arr, int i)
+struct Coordinates coords_1D_to_2D(UArray2b_T arr, int i)
 {
         struct Coordinates c = {-1, -1};
         if (i < 0 || i >= arr->real_width * arr->real_height) {
-                return;
+                return c;
         }
         int block = 0, row = 0, col = 0;
 
@@ -162,7 +188,6 @@ void coords_1D_to_2D(UArray2b_T arr, int i)
                 c.col = col;
                 c.row = row;
         }
-        fprintf(stderr, "[%d, %d]\n", c.col, c.row);
 
-        // return c;
+        return c;
 }
