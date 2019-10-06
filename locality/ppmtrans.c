@@ -7,8 +7,10 @@
 #include "a2plain.h"
 #include "a2blocked.h"
 #include "pnm.h"
+#include "cputiming.h"
 
 #include "openfile.h"
+#include "coords_calcs.h"
 #include "coordinates.h"
 
 #define SET_METHODS(METHODS, MAP, WHAT) do {                    \
@@ -25,15 +27,21 @@
 
 typedef A2Methods_UArray2 A2;
 
-struct rotate_closure {
-        int degrees;
+static const int TRANSPOSE_CODE = 1;
+static const int FLIP_HOR_CODE = 2;
+static const int FLIP_VER_CODE = 3;
+
+struct transform_closure {
+        int amount;
         A2Methods_T methods;
         A2 output;
+        struct Coordinates (*coords_calc)(int img_height, int img_width,
+                                          int amount, struct Coordinates c);
 };
 
-struct Coordinates coords_rotate_90(int img_height, struct Coordinates c);
-
-void rotate(int i, int j, A2Methods_UArray2 array, void *elemm, void *cl);
+void transform(int i, int j, A2 array, void *elemm, void *cl);
+A2 make_a2_out(int rotation, A2Methods_T methods, Pnm_ppm pic);
+void assign_coords_calc(struct transform_closure *cl);
 
 static void
 usage(const char *progname)
@@ -47,10 +55,10 @@ usage(const char *progname)
 int main(int argc, char *argv[])
 {
         char *time_file_name = NULL, *img_file_name = NULL;
-        FILE *image = NULL;
-        (void) time_file_name;
-        int   rotation       = 0;
+        FILE *image = NULL, *timer_out = NULL;
+        int   rotation       = -1;
         int   i;
+        CPUTime_T timer = NULL;
 
         /* default to UArray2 methods */
         A2Methods_T methods = uarray2_methods_plain;
@@ -85,6 +93,22 @@ int main(int argc, char *argv[])
                         if (!(*endptr == '\0')) {    /* Not a number */
                                 usage(argv[0]);
                         }
+                } else if (strcmp(argv[i], "-transpose") == 0) {
+                        rotation = TRANSPOSE_CODE;
+                } else if (strcmp(argv[i], "-flip") == 0) {
+                        if (!(i + 1 < argc)) {      /* no flip spec */
+                                usage(argv[0]);
+                        }
+                        char *flip_spec = argv[++i];
+                        if (strcmp(flip_spec, "horizontal") == 0) {
+                                rotation = FLIP_HOR_CODE;
+                        }
+                        else if (strcmp(flip_spec, "vertical") == 0) {
+                                rotation = FLIP_VER_CODE;
+                        }
+                        else {
+                                usage(argv[0]);
+                        }
                 } else if (strcmp(argv[i], "-time") == 0) {
                         time_file_name = argv[++i];
                 } else if (*argv[i] == '-') {
@@ -101,26 +125,33 @@ int main(int argc, char *argv[])
                 img_file_name = argv[argc - 1];
         }
         image = open_file(img_file_name);
-
         Pnm_ppm pnm = load_ppm(image, methods);
 
-        A2 out;
-        if (rotation % 180 == 0) {
-                out = methods->new(pnm->width, pnm->height, sizeof(struct
-                                      Pnm_rgb));
-        }
-        else {
-                out = methods->new(pnm->height, pnm->width,
-                                      sizeof(struct Pnm_rgb));
-        }
-        struct rotate_closure cl = {rotation, methods, out};
-        methods->map_default(pnm->pixels, rotate, &cl);
+        A2 out = make_a2_out(rotation, methods, pnm);
 
-        struct Pnm_ppm pnm2 = {methods->width(cl.output),
-                               methods->height(cl.output),
-                               pnm->denominator, cl.output, methods};
+        struct transform_closure cl = {rotation, methods, out, NULL};
+        assign_coords_calc(&cl);
 
-        Pnm_ppmwrite(stdout, &pnm2);
+        if (time_file_name != NULL) {
+                timer = CPUTime_New();
+                timer_out = fopen(time_file_name, "w");
+                CPUTime_Start(timer);
+        }
+
+        methods->map_default(pnm->pixels, transform, &cl);
+
+        if (timer != NULL) {
+                double total_time = CPUTime_Stop(timer),
+                       time_per_p = total_time / (pnm->width * pnm->height);
+                fprintf(timer_out, "%0f\n%0f\n", total_time, time_per_p);
+                fclose(timer_out);
+                CPUTime_Free(&timer);
+        }
+
+        struct Pnm_ppm pnmout = {methods->width(cl.output),
+                                 methods->height(cl.output),
+                                 pnm->denominator, cl.output, methods};
+        Pnm_ppmwrite(stdout, &pnmout);
 
         Pnm_ppmfree(&pnm);
         methods->free(&out);
@@ -128,45 +159,45 @@ int main(int argc, char *argv[])
         return EXIT_SUCCESS;
 }
 
-
-void rotate(int i, int j, A2 array, void *elem, void *cl) {
-        struct rotate_closure *closure = cl;
+void transform(int i, int j, A2 array, void *elem, void *cl) {
+        struct transform_closure *closure = cl;
         struct Coordinates new_coords = {i, j};
         struct Pnm_rgb *pixel = elem, *at_p;
 
-        if (!(closure->degrees % 90 == 0)) {
-                fprintf(stderr, "Rotation must be 0, 90 180 or 270\n");
-                EXIT_FAILURE;
-        }
-        for (int i = 0; i < closure->degrees / 90; i++) {
-                if (i % 2 == 0) {
-                        new_coords = coords_rotate_90(
-                                closure->methods->height(array), new_coords);
-                }
-                else {
-                        new_coords = coords_rotate_90(
-                                closure->methods->width(array), new_coords);
-                }
-        }
+        new_coords = closure->coords_calc(closure->methods->height(array),
+                             closure->methods->width(array), closure->amount,
+                             new_coords);
+
 
         at_p = closure->methods->at(closure->output, new_coords.col,
                                     new_coords.row);
         *at_p = *pixel;
 }
 
-/* NOTE: Does NOT check the validity of the coordinates. Must be done
- *      elsewhere.
- */
-struct Coordinates coords_rotate_90(int img_height, struct Coordinates c)
+A2 make_a2_out(int rotation, A2Methods_T methods, Pnm_ppm pic)
 {
-        struct Coordinates results = {-1, -1};
-
-        results.col = img_height - c.row - 1;
-        results.row = c.col;
-
-
-        return results;
+        A2 result;
+        if (rotation % 180 == 0 || rotation == 0 ||
+            rotation == FLIP_HOR_CODE || rotation == FLIP_VER_CODE ) {
+                result = methods->new(pic->width, pic->height, sizeof(struct
+                                      Pnm_rgb));
+        }
+        else {
+                result = methods->new(pic->height, pic->width,
+                                      sizeof(struct Pnm_rgb));
+        }
+        return result;
 }
 
-/*  If you have an original image of size w × h, then when the image is rotated 90 degrees, pixel (i, j) in
-the original becomes pixel (h − j − 1, i) in the rotated image. */
+void assign_coords_calc(struct transform_closure *cl)
+{
+        if (cl->amount == 0 || cl->amount % 90 == 0) {
+                cl->coords_calc = rotate_calc;
+        } else if (cl->amount == TRANSPOSE_CODE) {
+                cl->coords_calc = transpose_calc;
+        } else if (cl->amount == FLIP_HOR_CODE) {
+                cl->coords_calc = flip_hor_calc;
+        } else if (cl->amount == FLIP_VER_CODE) {
+                cl->coords_calc = flip_ver_calc;
+        }
+}

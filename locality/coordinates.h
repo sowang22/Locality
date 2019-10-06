@@ -8,6 +8,11 @@
  *          functions that need to return two coordinates
  ***********************************************************************/
 
+#ifndef COORDINATES_H
+#define COORDINATES_H
+
 struct Coordinates { /* used by the private function coords_1D_to_2D */
         int col, row;
 };
+
+#endif

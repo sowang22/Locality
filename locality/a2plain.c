@@ -12,6 +12,7 @@
 
 #include <a2plain.h>
 #include "uarray2.h"
+#include "uarray2b.h"
 
 typedef A2Methods_UArray2 A2;
 

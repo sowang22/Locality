@@ -10,10 +10,10 @@ void print_for_map_2b(int col, int row, UArray2b_T array2b,
 
 int main()
 {
-        UArray2b_T my_arr = UArray2b_new(6, 6, sizeof(int), 2);
+        UArray2b_T my_arr = UArray2b_new(5, 5, sizeof(int), 2);
 
         UArray2b_map(my_arr, fill_array, NULL);
-        UArray2b_map(my_arr, print_for_map_2b, NULL);
+   //     UArray2b_map(my_arr, print_for_map_2b, NULL);
 
         UArray2b_free(&my_arr);
         assert (my_arr == NULL);

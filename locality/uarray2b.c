@@ -32,7 +32,7 @@ struct Coordinates coords_1D_to_2D(UArray2b_T arr, int i);
  * blocksize = square root of # of cells in block.
  * blocksize < 1 is a checked runtime error
  */
-extern UArray2b_T UArray2b_new (int w, int h, int size, int blocksize)
+extern UArray2b_T UArray2b_new(int w, int h, int size, int blocksize)
 {
         UArray2b_T aux = malloc(sizeof(struct UArray2b_T));
 
@@ -43,6 +43,12 @@ extern UArray2b_T UArray2b_new (int w, int h, int size, int blocksize)
 
         aux->real_width  = w + (aux->blocksize - (w % aux->blocksize));
         aux->real_height = h + (aux->blocksize - (h % aux->blocksize));
+        if (w % aux->blocksize == 0) {
+                aux->real_width = w;
+        }
+        if (h % aux->blocksize == 0) {
+                aux->real_height = h;
+        }
         aux->array     = UArray_new(aux->real_width * aux->real_height, size);
 
         return aux;
@@ -54,7 +60,7 @@ extern UArray2b_T UArray2b_new (int w, int h, int size, int blocksize)
 extern UArray2b_T UArray2b_new_64K_block(int w, int h, int size)
 {
         UArray2b_T aux = malloc(sizeof(struct UArray2b_T));
-        int blocksize_sq = KILOBYTE / size;
+        int blocksize_sq = 64 * KILOBYTE / size;
 
         aux->width     = w;
         aux->height    = h;
@@ -145,14 +151,15 @@ int coords_2D_to_1D(UArray2b_T arr, int col, int row)
 
         int block_col = col / arr->blocksize,
             block_row = row / arr->blocksize,
-            block_width = arr->real_width / arr->blocksize,
+            block_height = arr->real_height / arr->blocksize,
             index = 0;
 
-        index += (((block_row * block_width) + block_col)
+        index += (((block_col * block_height) + block_row)
                   * arr->blocksize * arr->blocksize);
         row %= arr->blocksize;
         col %= arr->blocksize;
         index += (row * arr->blocksize) + col;
+
 
         return index;
 }
@@ -170,8 +177,8 @@ struct Coordinates coords_1D_to_2D(UArray2b_T arr, int i)
         block = i / (arr->blocksize * arr->blocksize);
         i %= (arr->blocksize * arr->blocksize);
 
-        col += (block % (arr->real_width / arr->blocksize));
-        row += block / (arr->real_width / arr->blocksize);
+        col += block / (arr->real_height / arr->blocksize);
+        row += block % (arr->real_height / arr->blocksize);
 
         col *= arr->blocksize;
         row *= arr->blocksize;

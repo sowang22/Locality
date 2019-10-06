@@ -68,7 +68,7 @@ timing_test: timing_test.o cputiming.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 ppmtrans: ppmtrans.o cputiming.o uarray2b.o uarray2.o a2plain.o a2blocked.o \
-	openfile.o
+	openfile.o coords_calcs.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 testing: testingmain.o uarray2b.o

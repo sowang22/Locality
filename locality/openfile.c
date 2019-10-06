@@ -52,8 +52,8 @@ Pnm_ppm load_ppm(FILE *image_file, A2Methods_T methods)
             methods->height(img->pixels) < 1) {
                 RAISE(bad_input);
         }
-        return img;
         if (image_file != stdin) {
                 fclose(image_file);
         }
+        return img;
 }
