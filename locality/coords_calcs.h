@@ -1,3 +1,15 @@
+/***********************************************************************
+ *                          coords_calcs.h
+ * Assignment: Homework 3 for Comp 40, Fall 2019
+ * Authors: Camille Calabrese (ccalab04) and Sophia Wang (swang30)
+ * Date: October 6, 2019
+ *
+ * Summary: This is a header file containing the function definitions
+            for transforming the image. These functions calculate the
+            new coordinates and return a struct containing the new coords.
+ ***********************************************************************/
+
+
 #ifndef COORDS_CALCS_H
 #define COORDS_CALCS_H
 

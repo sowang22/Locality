@@ -159,6 +159,14 @@ int main(int argc, char *argv[])
         return EXIT_SUCCESS;
 }
 
+/*
+ * UArray2_height
+ *    Purpose: Returns the height of a UArray2_T object in elements.
+ * Parameters: A UArray2_T object
+ *    Returns: An integer for the height of that UArray2_T object, in elements
+ *    Expects: That the parameter is a valid UArray2_T object, and that that
+ *             UArray2_T object has a height.
+ */
 void transform(int i, int j, A2 array, void *elem, void *cl) {
         struct transform_closure *closure = cl;
         struct Coordinates new_coords = {i, j};
@@ -174,6 +182,14 @@ void transform(int i, int j, A2 array, void *elem, void *cl) {
         *at_p = *pixel;
 }
 
+/*
+ * UArray2_height
+ *    Purpose: Returns the height of a UArray2_T object in elements.
+ * Parameters: A UArray2_T object
+ *    Returns: An integer for the height of that UArray2_T object, in elements
+ *    Expects: That the parameter is a valid UArray2_T object, and that that
+ *             UArray2_T object has a height.
+ */
 A2 make_a2_out(int rotation, A2Methods_T methods, Pnm_ppm pic)
 {
         A2 result;
@@ -189,6 +205,14 @@ A2 make_a2_out(int rotation, A2Methods_T methods, Pnm_ppm pic)
         return result;
 }
 
+/*
+ * UArray2_height
+ *    Purpose: Returns the height of a UArray2_T object in elements.
+ * Parameters: A UArray2_T object
+ *    Returns: An integer for the height of that UArray2_T object, in elements
+ *    Expects: That the parameter is a valid UArray2_T object, and that that
+ *             UArray2_T object has a height.
+ */
 void assign_coords_calc(struct transform_closure *cl)
 {
         if (cl->amount == 0 || cl->amount % 90 == 0) {
