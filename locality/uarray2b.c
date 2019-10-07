@@ -11,6 +11,7 @@
 #include "uarray2b.h"
 #include "uarray.h"
 #include "coordinates.h"
+#include "except.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -22,18 +23,27 @@ struct UArray2b_T {
         UArray_T array;
 };
 
+Except_T invalid_input = {"Invalid Input"};
+
         /* Private function prototypes */
 int coords_2D_to_1D(UArray2b_T arr, int col, int row);
 struct Coordinates coords_1D_to_2D(UArray2b_T arr, int i);
 
 
 /*
- * new blocked 2d array
- * blocksize = square root of # of cells in block.
- * blocksize < 1 is a checked runtime error
+ * UArray2b_new
+ *    Purpose: Creates a new blocked 2D array
+ * Parameters: width, height, the size of one element in bytes, and the
+ *             blocksize (square root of the number of elements in a block)
+ *    Returns: The blocked 2D array
+ *    Expects: That width, height, size, and blocksize are all at least 1
+ *             (checked runtime error)
  */
 extern UArray2b_T UArray2b_new(int w, int h, int size, int blocksize)
 {
+        if (w < 1 || h < 1 || size < 1 || blocksize < 1) {
+                RAISE(invalid_input);
+        }
         UArray2b_T aux = malloc(sizeof(struct UArray2b_T));
 
         aux->width     = w;
@@ -54,11 +64,20 @@ extern UArray2b_T UArray2b_new(int w, int h, int size, int blocksize)
         return aux;
 }
 
-/* new blocked 2d array: blocksize as large as possible provided
- * block occupies at most 64KB (if possible)
+/*
+ * UArray2b_new_64K_block
+ *    Purpose: Creates a new blocked 2D array, where each block of the array
+ *             is as large as possible while totaling 64KB or less. If an
+ *             element is more than 64KB, blocksize is 1.
+ * Parameters: width, height, and element size of the array
+ *    Returns: The blocked 2D array
+ *    Expects: That width, height, and size are all at least one
  */
 extern UArray2b_T UArray2b_new_64K_block(int w, int h, int size)
 {
+        if (w < 1 || h < 1 || size < 1) {
+                RAISE(invalid_input);
+        }
         UArray2b_T aux = malloc(sizeof(struct UArray2b_T));
         int blocksize_sq = 64 * KILOBYTE / size;
 
