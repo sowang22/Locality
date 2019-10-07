@@ -23,7 +23,7 @@ struct UArray2b_T {
         UArray_T array;
 };
 
-Except_T invalid_input = {"Invalid Input"};
+Except_T invalid_input = {"Invalid Parameter"};
 
         /* Private function prototypes */
 int coords_2D_to_1D(UArray2b_T arr, int col, int row);
@@ -97,43 +97,92 @@ extern UArray2b_T UArray2b_new_64K_block(int w, int h, int size)
         return aux;
 }
 
+/*
+ * UArray2b_free
+ *    Purpose: Frees the memory associated with a blocked 2D array
+ * Parameters: a pointer to a UArray2b_T
+ *    Returns: nothing
+ *    Expects: That the pointer passed in as a parameter is valid and points
+ *             to a UArray2b_T
+ */
 extern void UArray2b_free(UArray2b_T *array2b)
 {
+        if (array2b == NULL || *array2b == NULL) {
+                return;
+        }
         UArray_free(&((*array2b)->array));
         free(*(array2b));
         *array2b = NULL;
 }
 
+/*
+ * UArray2b_width
+ *    Purpose: Returns the width of a blocked 2D array
+ * Parameters: a UArray2b_T
+ *    Returns: the width of that UArray2b_T
+ *    Expects: That the pointer passed in is valid
+ */
 extern int UArray2b_width(UArray2b_T array2b)
 {
+        if (array2b == NULL) {
+                RAISE(invalid_input);
+        }
         return array2b->width;
 }
 
+/*
+ * UArray2b_height
+ *    Purpose: Returns the height of a blocked 2D array
+ * Parameters: a UArray2b_T
+ *    Returns: the height of that UArray2b_T
+ *    Expects: That the pointer passed in is valid
+ */
 extern int UArray2b_height(UArray2b_T array2b)
 {
+        if (array2b == NULL) {
+                RAISE(invalid_input);
+        }
         return array2b->height;
 }
 
+/*
+ * UArray2b_size
+ *    Purpose: Returns the element size of a blocked 2D array
+ * Parameters: a UArray2b_T
+ *    Returns: the element size of that UArray2b_T
+ *    Expects: That the pointer passed in is valid
+ */
 extern int UArray2b_size(UArray2b_T array2b)
 {
+        if (array2b == NULL) {
+                RAISE(invalid_input);
+        }
         return array2b->elem_size;
 }
 
+/*
+ * UArray2b_blocksize
+ *    Purpose: Returns the block size of a blocked 2D array
+ * Parameters: a UArray2b_T
+ *    Returns: the block size of that UArray2b_T
+ *    Expects: That the pointer passed in is valid
+ */
 extern int UArray2b_blocksize(UArray2b_T array2b)
 {
+        if (array2b == NULL) {
+                RAISE(invalid_input);
+        }
         return array2b->blocksize;
 }
 
 /* return a pointer to the cell in the given column and row.
  * index out of range is a checked run-time error
  *
- * Note: can be used to check if coordinates are valid. Returns a NULL
- *      pointer if coordinates are not valid. Therefore, expects that the
- *      array does not store any null pointers.
  */
 extern void *UArray2b_at(UArray2b_T array2b, int col, int row)
 {
         if (coords_2D_to_1D(array2b, col, row) == -1) {
+                RAISE(invalid_input);
                 return NULL;
         }
         else {
