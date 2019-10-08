@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
 }
 
 /*
- * UArray2_height
+ * transform
  *    Purpose: Returns the height of a UArray2_T object in elements.
  * Parameters: A UArray2_T object
  *    Returns: An integer for the height of that UArray2_T object, in elements
@@ -180,10 +180,11 @@ void transform(int i, int j, A2 array, void *elem, void *cl) {
         at_p = closure->methods->at(closure->output, new_coords.col,
                                     new_coords.row);
         *at_p = *pixel;
+        return;
 }
 
 /*
- * UArray2_height
+ * make_a2_out
  *    Purpose: Returns the height of a UArray2_T object in elements.
  * Parameters: A UArray2_T object
  *    Returns: An integer for the height of that UArray2_T object, in elements
@@ -206,7 +207,7 @@ A2 make_a2_out(int rotation, A2Methods_T methods, Pnm_ppm pic)
 }
 
 /*
- * UArray2_height
+ * assign_coords_calc
  *    Purpose: Returns the height of a UArray2_T object in elements.
  * Parameters: A UArray2_T object
  *    Returns: An integer for the height of that UArray2_T object, in elements
@@ -224,4 +225,5 @@ void assign_coords_calc(struct transform_closure *cl)
         } else if (cl->amount == FLIP_VER_CODE) {
                 cl->coords_calc = flip_ver_calc;
         }
+        return;
 }
