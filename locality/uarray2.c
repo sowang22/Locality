@@ -230,7 +230,9 @@ void UArray2_map_col_major(UArray2_T arr, void apply(int col, int row,
  *    Returns: Nothing
  *    Expects: That the UArray2_T object is valid and that the apply function
  *             serves its own intended purpose and has parameters matching the
- *             UArray2_map_regions function prototype
+ *             UArray2_map_regions function prototype. Also expects that the
+ *             closure argument is appropriate for the specified apply
+ *             function (unchecked).
  */
 void UArray2_map_regions(UArray2_T arr, void apply(int col, int row,
         UArray2_T arr, void *pt1, void *pt2), void *cl)

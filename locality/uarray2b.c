@@ -238,13 +238,13 @@ extern void  UArray2b_map(UArray2b_T array2b,
  *             corresponds with the specified coordinates
  * Parameters: A UArray2b and ints for the column and row coordinates
  *    Returns: an integer for the one-dimensional index value
- *    Expects: That the UArray2b is valid (checked runtime error)
+ *    Expects: That the UArray2b is valid (checked runtime error), and
+ *             expects NOT to be used by client code directly (this is a
+ *             private function)
  *       NOTE: Does not necessarily expect that the coordinates are valid
  *             because it can be used to check the validity of coordinates.
  *             returns -1 if coordinates are out of bounds.
  */
-/* Note: can be used to check if coordinates are valid. Returns -1 for
- * invalid coordinates */
 int coords_2D_to_1D(UArray2b_T arr, int col, int row)
 {
         if (arr == NULL) {
@@ -270,8 +270,20 @@ int coords_2D_to_1D(UArray2b_T arr, int col, int row)
         return index;
 }
 
-/* Note: Can be used to check if a coordinate is valid. Returns {-1, -1} if
- * coordinate is invalid. */
+/*
+ * coords_1D_to_2D
+ *    Purpose: Converts a single integer index, representing a slot in the
+ *             underlying UArray_T, to the col and row coordinates that
+ *             correspond to that slot
+ * Parameters: A UArray2b and an integer index
+ *    Returns: A Coordinates struct with the column and row coordinates that
+ *             correspond to the specified index
+ *    Expects: that the UArray2b is valid, and expects NOT to be called by
+ *             the client code directly (this function is private).
+ *       NOTE: Does not necessarily expect to receive in-bound coordinates.
+ *             This function can be used to check the validity of an index,
+ *             and returns {-1, -1} if the index is out of bounds.
+ */
 struct Coordinates coords_1D_to_2D(UArray2b_T arr, int i)
 {
         if (arr == NULL) {
