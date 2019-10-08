@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
                         if (!(rotation == 0 || rotation == 90 ||
                             rotation == 180 || rotation == 270)) {
                                 fprintf(stderr,
-					"Rotation must be 0, 90 180 or 270\n");
+					"Rotation must be 0, 90, 180, or 270\n");
                                 usage(argv[0]);
                         }
                         if (!(*endptr == '\0')) {    /* Not a number */
@@ -126,7 +126,6 @@ int main(int argc, char *argv[])
         }
         image = open_file(img_file_name);
         Pnm_ppm pnm = load_ppm(image, methods);
-
         A2 out = make_a2_out(rotation, methods, pnm);
 
         struct transform_closure cl = {rotation, methods, out, NULL};
@@ -184,11 +183,16 @@ void transform(int i, int j, A2 array, void *elem, void *cl) {
 
 /*
  * make_a2_out
- *    Purpose: Returns the height of a UArray2_T object in elements.
- * Parameters: A UArray2_T object
- *    Returns: An integer for the height of that UArray2_T object, in elements
- *    Expects: That the parameter is a valid UArray2_T object, and that that
- *             UArray2_T object has a height.
+ *    Purpose: Creates a new A2 object based on the type of transformation it
+ *             is given. For rotations in the first if statement, these
+ *             transformations are marked by keeping the width and height the
+ *             same in the new A2 object. For the rest of the rotations, the
+ *             width and height parameters must be switched.
+ * Parameters: int rotation, A2Methods_T object, Pnm_ppm object
+ *    Returns: A new A2 object with the new dimensions after the image has
+ *             been transformed.
+ *    Expects: int rotation must be a valid degree or code, A2Methods_T object
+ *             cannot be NULL, and Pnm_ppm object also cannot be NULL
  */
 A2 make_a2_out(int rotation, A2Methods_T methods, Pnm_ppm pic)
 {
@@ -207,14 +211,16 @@ A2 make_a2_out(int rotation, A2Methods_T methods, Pnm_ppm pic)
 
 /*
  * assign_coords_calc
- *    Purpose: Returns the height of a UArray2_T object in elements.
- * Parameters: A UArray2_T object
- *    Returns: An integer for the height of that UArray2_T object, in elements
- *    Expects: That the parameter is a valid UArray2_T object, and that that
- *             UArray2_T object has a height.
+ *    Purpose: Handles the rotation. Calls the appropriate rotation method
+ *             based on the degrees it gets passed in or the code passed in
+ * Parameters: Closure argument; in this case, a pointer to a struct
+ *    Returns: Nothing
+ *    Expects: The closure argument/struct is not NULL and the amount element
+ *             of the struct must be a valid degree or flip code.
  */
 void assign_coords_calc(struct transform_closure *cl)
 {
+        // need a case to handle null/exception
         if (cl->amount == 0 || cl->amount % 90 == 0) {
                 cl->coords_calc = rotate_calc;
         } else if (cl->amount == TRANSPOSE_CODE) {
