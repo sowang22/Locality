@@ -40,15 +40,32 @@ images were all wider than they were tall. For future tests, we would be
 interested to see what the results are for a portrait-oriented image and
 compare that to the results we got here.
 
-Our analysis follows, and the tables with our results are below.
+Our methodology consisted of starting the timer just before the map
+function was called and stopping it just after the map function was
+completed. Therefore, our times do not include operations such as reading
+in the original image or creating arrays, they only time the transformation
+itself.
 
+Computer Details: Intel i7-6700, 3.40 GHz, 4 cores
+                  Dell Precision Tower 3420
 
+Our analysis can be found below the tables.
 
-
-
-
-T = "Total"
+T  = "Total"
 PP = "per pixel"
+*** NOTE: Measurements are in Nanoseconds. Nanoseconds are 1 billionth of
+          a second, so the number of nanoseconds is roughly equal to the
+          number of CPU instructions. For example, for the Obama photo, 0
+          degree rotation, col major, the rotation took roughly 54 nanoseconds
+          per pixel.
+          1 second / 1,000,000,000 nanoseconds per second * 1,000,000,000
+          CPU instructions per second = 1 CPU instruction per nanosecond
+          OR
+          1 nanosecond / 1,000,000,000 nanoseconds per second * 1,000,000,000
+          CPU instructions per second = 1 CPU instruction per nanosecond
+          EXAMPLE
+          53.876258 nanoseconds = 0.000000053876258 seconds = 53.876258 CPU
+          instructions
 
 __________________________________________________________________________
 |                           obama.pnm: 3108 x 2331                       |
@@ -85,7 +102,7 @@ __________________________________________________________________________
 | 0 degrees       | T:3016308973    | T:2318113160   | T:5480941011
                   | PP:60.399625    | PP:46.418708   | PP:109.752279
 __________________________________________________________________________
-| 90 degrees      | T: 273673929| T:249009561|  T: 5714615654
+| 90 degrees      | T: 273673929    | T:249009561    |  T: 5714615654
                   | PP:54.801424    | PP:51.864980   |  PP:114.431462
 __________________________________________________________________________
 | 180 degrees     | T:3401514648    | T:2828750544   |  T:6047547398
@@ -130,6 +147,49 @@ __________________________________________________________________________
 | Transpose       | T: 3536194463  | T:3465058586   | T:7754879125
                   | PP:51.084092   | PP:50.056459   | PP:112.027481
 __________________________________________________________________________
+
+
+ANALYSIS
+
+Despite our predictions to the contrary, row major is the fastest, with
+column major a close second and block major much slower.
+
+Although we are not seriously considering the results from the Megan photo, it
+is worth noting that column major was slightly faster than row major when
+transforming that photo, which was in portrait orientation. In future tests, it
+would be interesting to see if this trend applies to larger portrait photos.
+
+The number of instructions per pixel among row major, column major, and
+block major remained remarkably consistent regardless of image size. The main
+fluctuations in these measurements are related to the type of transformation.
+
+The row major times fluctuated the most between different kinds of
+transformations compared to the overall size of the measurements. However,
+even the row major times per pixel were, again, very consistent for different
+sized photos.
+
+We theorize that the increased complexity of our coordinates
+calculators for rotations is the reason that rotations seem to generally
+take longer. Whereas the flip and transpose calculators simply perform an
+arithmetic operation, the rotation calculator runs a loop that calls another
+function to perform an arithmetic operation for every 90 degrees in the
+rotation. This would also explain why rotations of more degrees take longer
+than rotations of fewer degrees, with the exception of 0 degrees, which is
+sometimes slower than the 90 degree rotation.
+
+Because the higher degree rotations aren't all that much slower than their
+lower degree counterparts, and all coordinates calculator functions are
+essentially just basic arithmetic operations, our guess is that the effect of
+the coordinate calculator functions, while noticeable, is small and is not
+the cause of the most serious speed bottleneck. This is reinforced by the
+fact that variance in the times for different mapping function is much more
+severe than variance in times between types of transformations.
+
+Overall, we were surprised that the order from fastest to slowest was
+consistently row-major, col-major, and then block-major as a distant third.
+We were also surprised that this held firm despite the size of the image or
+the type of rotation. On the other hand, we were impressed that the time per
+pixel remained so consistent for any size image.
 
 ***************************** TIME COMMITMENT ****************************
 We spent roughly 20 hours on this assignment.
