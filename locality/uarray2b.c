@@ -218,7 +218,7 @@ extern void  UArray2b_map(UArray2b_T array2b,
                                      void *elem, void *cl), void *cl)
 {
         if (array2b == NULL) {
-                RAISE(bad_input);
+                RAISE(invalid_input);
         }
         struct Coordinates coords;
         for (int i = 0; i < array2b->real_width * array2b->real_height; i++) {
@@ -248,7 +248,7 @@ extern void  UArray2b_map(UArray2b_T array2b,
 int coords_2D_to_1D(UArray2b_T arr, int col, int row)
 {
         if (arr == NULL) {
-                RAISE(bad_input);
+                RAISE(invalid_input);
         }
         if (col < 0 || col >= arr->width ||
             row < 0 || row >= arr->height) {
@@ -287,7 +287,7 @@ int coords_2D_to_1D(UArray2b_T arr, int col, int row)
 struct Coordinates coords_1D_to_2D(UArray2b_T arr, int i)
 {
         if (arr == NULL) {
-                RAISE(bad_input);
+                RAISE(invalid_input);
         }
         struct Coordinates c = {-1, -1};
         if (i < 0 || i >= (arr->real_width * arr->real_height)) {
