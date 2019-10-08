@@ -64,6 +64,9 @@ UArray2_T UArray2_new(int w, int h, int elem_size)
  */
 void UArray2_free(UArray2_T *arr)
 {
+        if (arr == NULL || *arr == NULL) {
+                return;
+        }
         UArray_free(&((*arr)->arry));
         if ((*arr)->arry != NULL) {
                 RAISE(Bad_array);
@@ -140,9 +143,16 @@ int  UArray2_height(UArray2_T arr)
  *             coordinates are coordinates within the UArray2_T object, that
  *             is, between -1 and the width/height of the UArray2_T object,
  *             respectively, noninclusive.
+ *       NOTE: UArray2_at returns a NULL pointer if the given coordinates are
+ *             invalid, and thus can be used to check the validity of
+ *             coordinates. Therefore, a UArray2 should not store NULL
+ *             pointers if you wish to use this feature.
  */
 void *UArray2_at(UArray2_T arr, int col, int row)
 {
+        if (arr == NULL) {
+                RAISE(Bad_array);
+        }
         int index;
         void *return_val;
         TRY
@@ -171,6 +181,9 @@ void *UArray2_at(UArray2_T arr, int col, int row)
 void UArray2_map_row_major(UArray2_T arr, void apply(int col, int row,
         UArray2_T arr, void *pt1, void *pt2), void *cl)
 {
+        if (arr == NULL) {
+                RAISE(Bad_array);
+        }
         int col = 0, row = 0;
         for (row = 0; row < arr->height; row++) {
                 for (col = 0; col < arr->width; col++) {
@@ -195,6 +208,9 @@ void UArray2_map_row_major(UArray2_T arr, void apply(int col, int row,
 void UArray2_map_col_major(UArray2_T arr, void apply(int col, int row,
         UArray2_T arr, void *pt1, void *pt2), void *cl)
 {
+        if (arr == NULL) {
+                RAISE(Bad_array);
+        }
         int col = 0, row = 0;
         for (col = 0; col < arr->width; col++) {
                 for (row = 0; row < arr->height; row++) {
@@ -219,6 +235,9 @@ void UArray2_map_col_major(UArray2_T arr, void apply(int col, int row,
 void UArray2_map_regions(UArray2_T arr, void apply(int col, int row,
         UArray2_T arr, void *pt1, void *pt2), void *cl)
 {
+        if (arr == NULL) {
+                RAISE(Bad_array);
+        }
         int col = 0, row = 0;
         while (col < arr->width && row < arr->height) {
                 apply(col, row, arr, UArray2_at(arr, col, row), cl);
@@ -255,6 +274,9 @@ void UArray2_map_regions(UArray2_T arr, void apply(int col, int row,
  */
 int  UArray2_coords_to_index(UArray2_T arr, int col, int row)
 {
+        if (arr == NULL) {
+                RAISE(Bad_array);
+        }
         if (col < 0 || col >= arr->width || row < 0 || row >= arr->height) {
                 RAISE(Bad_coords);
         }
