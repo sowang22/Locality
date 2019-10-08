@@ -11,6 +11,7 @@
 #include "uarray2b.h"
 #include "uarray.h"
 #include "coordinates.h"
+#include "assert.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -32,8 +33,18 @@ struct Coordinates coords_1D_to_2D(UArray2b_T arr, int i);
  * blocksize = square root of # of cells in block.
  * blocksize < 1 is a checked runtime error
  */
+
+ /*
+  * UArray2b_new
+  *    Purpose: Creates a new 2D blocked array
+  * Parameters: Ints height, width, size, and blocksize
+  *    Returns: A pointer to a 2D block array
+  *    Expects: Parameters are non-zero.
+  */
 extern UArray2b_T UArray2b_new(int w, int h, int size, int blocksize)
 {
+        assert(w != 0 && h != 0 && size != 0 && blocksize != 0);
+
         UArray2b_T aux = malloc(sizeof(struct UArray2b_T));
 
         aux->width     = w;
@@ -57,8 +68,18 @@ extern UArray2b_T UArray2b_new(int w, int h, int size, int blocksize)
 /* new blocked 2d array: blocksize as large as possible provided
  * block occupies at most 64KB (if possible)
  */
+
+ /*
+  * UArray2b_new_64K_block
+  *    Purpose: Creates a new 2D blocked array. Calculates the block size
+  *             that will be used in the array.
+  * Parameters: Ints width, height, and size
+  *    Returns: A pointer to a 2D blocked array
+  *    Expects: Parameters must be nonzero.
+  */
 extern UArray2b_T UArray2b_new_64K_block(int w, int h, int size)
 {
+        assert(w != 0 && h != 0 && size != 0);
         UArray2b_T aux = malloc(sizeof(struct UArray2b_T));
         int blocksize_sq = 64 * KILOBYTE / size;
 
@@ -78,42 +99,89 @@ extern UArray2b_T UArray2b_new_64K_block(int w, int h, int size)
         return aux;
 }
 
+/*
+ * UArray2b_free
+ *    Purpose: Frees the memory associated with the array
+ * Parameters: A UArray2b_T object
+ *    Returns: Nothing
+ *    Expects: That the parameter is a valid UArray2_T object, and that that
+ *             UArray2_T object has a height.
+ */
 extern void UArray2b_free(UArray2b_T *array2b)
 {
+        assert(array2b != NULL); // might have to do the address and parameter comment
         UArray_free(&((*array2b)->array));
         free(*(array2b));
         *array2b = NULL;
+        return;
 }
 
+/*
+ * UArray2b_width
+ *    Purpose: Returns the width of a UArray2b_T object
+ * Parameters: A UArray2b_T object
+ *    Returns: The width of the UArray2b_T object
+ *    Expects: UArray2b_T object cannot be NULL
+ */
 extern int UArray2b_width(UArray2b_T array2b)
 {
+        assert(array2b != NULL);
         return array2b->width;
 }
 
+/*
+ * UArray2b_height
+ *    Purpose: Returns the height of a UArray2_T object
+ * Parameters: A UArray2b_T object
+ *    Returns: The height of the UArray2b_T object
+ *    Expects: UArray2b_T object cannot be NULL
+ */
 extern int UArray2b_height(UArray2b_T array2b)
 {
+        assert(array2b != NULL);
         return array2b->height;
 }
 
+/*
+ * UArray2b_size
+ *    Purpose: Returns the size of an element of an UArray2b_T object
+ * Parameters: A UArray2b_T object
+ *    Returns: An integer for the size of an element in the UArray2b_T object
+ *    Expects: UArray2b_T object cannot be NULL
+ */
 extern int UArray2b_size(UArray2b_T array2b)
 {
+        assert(array2b != NULL);
         return array2b->elem_size;
 }
 
+/*
+ * UArray2b_blocksize
+ *    Purpose: Returns the blocksize of a UArray2b_T object
+ * Parameters: A UArray2_T object
+ *    Returns: Size of the block in the UArray2b_T object
+ *    Expects: UArray2b_T object cannot be NULL
+ */
 extern int UArray2b_blocksize(UArray2b_T array2b)
 {
+        assert(array2b != NULL);
         return array2b->blocksize;
 }
 
-/* return a pointer to the cell in the given column and row.
- * index out of range is a checked run-time error
- *
- * Note: can be used to check if coordinates are valid. Returns a NULL
- *      pointer if coordinates are not valid. Therefore, expects that the
- *      array does not store any null pointers.
- */
+ /*
+  * UArray2b_at
+  *    Purpose: Returns the pointer to the cell in the given col and row
+  * Parameters: A UArray2b_T object, int column and row
+  *    Returns: Void pointer to the value stored at a certain index
+  *    Expects: That the parameter is a valid UArray2_T object and the row and
+  *             column values passed in must be valid.
+  *       Note: can be used to check if coordinates are valid. Returns a NULL
+  *             pointer if coordinates are not valid. Therefore, expects that
+  *             the array does not store any null pointers.
+  */
 extern void *UArray2b_at(UArray2b_T array2b, int col, int row)
 {
+        assert(array2b != NULL);
         if (coords_2D_to_1D(array2b, col, row) == -1) {
                 return NULL;
         }
@@ -123,11 +191,21 @@ extern void *UArray2b_at(UArray2b_T array2b, int col, int row)
         }
 }
 
-/* visits every cell in one block before moving to another block */
+/*
+ * UArray2b_map
+ *    Purpose: Mapping function that maps through every element of the 2D
+ *             blocked array; visits every cell in 1 block before moving to
+ *             another block (block-major)
+ * Parameters: A UArray2_T object, apply function, closure argument
+ *    Returns: Nothing
+ *    Expects: That the parameter is a valid UArray2_T object, apply function
+ *             with its valid parameters, and a valid closure argument.
+ */
 extern void  UArray2b_map(UArray2b_T array2b,
                           void apply(int col, int row, UArray2b_T array2b,
                                      void *elem, void *cl), void *cl)
 {
+        assert(array2b != NULL);
         struct Coordinates coords;
         for (int i = 0; i < array2b->real_width * array2b->real_height; i++) {
                 coords = coords_1D_to_2D(array2b, i);
@@ -137,13 +215,22 @@ extern void  UArray2b_map(UArray2b_T array2b,
                               cl);
                 }
         }
+        return;
 }
 
-
-/* Note: can be used to check if coordinates are valid. Returns -1 for
- * invalid coordinates */
+ /*
+  * coords_2D_to_1D
+  *    Purpose: Converts the 2D array coordinates to the coordinates in the
+  *             1D representation.
+  * Parameters: A UArray2_T object, int col and row
+  *    Returns: Index/Coordinate of the element in the 1D array
+  *    Expects: UArray2b_T object not NULL, col and row must be valid coords
+  *       Note: Can be used to check if coordinates are valid. Returns -1 for
+  *             invalid coordinates
+  */
 int coords_2D_to_1D(UArray2b_T arr, int col, int row)
 {
+        assert(arr != NULL);
         if (col < 0 || col >= arr->width ||
             row < 0 || row >= arr->height) {
                     return -1;
@@ -164,10 +251,18 @@ int coords_2D_to_1D(UArray2b_T arr, int col, int row)
         return index;
 }
 
-/* Note: Can be used to check if a coordinate is valid. Returns {-1, -1} if
- * coordinate is invalid. */
+ /*
+  * coords_1D_to_2D
+  *    Purpose: Converts the 1D array index to the 2D array coordinates
+  * Parameters: A UArray2_T object, int i (index)
+  *    Returns: Struct Coordinates containing the 2D coordinates
+  *    Expects: UArray2b_T must be non-NULL, 1D index must be valid
+  *       Note: Can be used to check if a coordinate is valid.
+                Returns {-1, -1} if coordinate is invalid.
+  */
 struct Coordinates coords_1D_to_2D(UArray2b_T arr, int i)
 {
+        assert(arr != NULL);
         struct Coordinates c = {-1, -1};
         if (i < 0 || i >= arr->real_width * arr->real_height) {
                 return c;
