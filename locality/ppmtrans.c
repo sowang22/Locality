@@ -137,8 +137,7 @@ int main(int argc, char *argv[])
                 timer_out = fopen(time_file_name, "w");
                 CPUTime_Start(timer);
         }
-
-        methods->map_default(pnm->pixels, transform, &cl);
+        map(pnm->pixels, transform, &cl);
 
         if (timer != NULL) {
                 double total_time = CPUTime_Stop(timer),

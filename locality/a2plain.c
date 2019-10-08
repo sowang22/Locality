@@ -127,7 +127,7 @@ static struct A2Methods_T uarray2_methods_plain_struct = {
 	small_map_row_major,
 	small_map_col_major,
 	NULL,                   /* small_map_block_major */
-	small_map_col_major,	// small_map_default
+	small_map_col_major,	/* small_map_default */
 };
 
 // finally the payoff: here is the exported pointer to the struct
