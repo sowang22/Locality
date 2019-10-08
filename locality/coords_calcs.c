@@ -6,6 +6,11 @@
  *
  * Functions for calculating new coordinates after rotating, flipping,
  *      or transposing the input coordinates.
+ *
+ * NOTE: NONE OF THE COORDINATES CALCULATORS IMPLEMENTED BELOW CHECK IF
+ * COORDINATES ARE VALID. THIS MUST BE DONE BEFORE CALLING A COORDNATES
+ * CALCULATOR. IT IS INTENTIONALLY LEFT UNCHECKED AS THE PRIORITY FOR
+ * THESE FUNCTIONS IS SIMPLICITY.
  ***********************************************************************/
 
 #include "coords_calcs.h"
