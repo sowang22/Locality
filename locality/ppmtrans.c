@@ -160,24 +160,39 @@ int main(int argc, char *argv[])
 
 /*
  * transform
- *    Purpose: Returns the height of a UArray2_T object in elements.
- * Parameters: A UArray2_T object
- *    Returns: An integer for the height of that UArray2_T object, in elements
- *    Expects: That the parameter is a valid UArray2_T object, and that that
- *             UArray2_T object has a height.
+ *    Purpose: Meant to be passed into a map function. Copies the given
+ *             pixel into the appropriate place in the output array
+ * Parameters: int i and j for the col and row coordinates; an A2 object; a
+ *             void pointer to a pixel in the existing photo; and a void
+ *             pointer to the closure argument
+ *    Returns: Nothing
+ *    Expects: That the A2 is valid and the coordinates are in bounds
+ *             (checked), that the void *elem points to a valid Pnm_rgb struct
+ *             (unchecked), that the void *elem is nonnull (checked), that
+ *             the void *cl is nonnull (checked), and that the void *cl
+ *             points to a valid transform_closure struct (unchecked)
  */
 void transform(int i, int j, A2 array, void *elem, void *cl) {
         struct transform_closure *closure = cl;
         struct Coordinates new_coords = {i, j};
         struct Pnm_rgb *pixel = elem, *at_p;
+        if (array == NULL || closure == NULL) {
+                RAISE(bad_parameter);
+        }
+        if (i < 0 || i >= closure->methods->width(array) ||
+            j < 0 || j >= closure->methods->width(array)) {
+                    RAISE(bad_parameter);
+        }
 
         new_coords = closure->coords_calc(closure->methods->height(array),
                              closure->methods->width(array), closure->amount,
                              new_coords);
 
-
         at_p = closure->methods->at(closure->output, new_coords.col,
                                     new_coords.row);
+        if (pixel == NULL || at_p == NULL) {
+                RAISE(bad_parameter);
+        }
         *at_p = *pixel;
         return;
 }

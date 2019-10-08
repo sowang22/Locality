@@ -143,10 +143,6 @@ int  UArray2_height(UArray2_T arr)
  *             coordinates are coordinates within the UArray2_T object, that
  *             is, between -1 and the width/height of the UArray2_T object,
  *             respectively, noninclusive.
- *       NOTE: UArray2_at returns a NULL pointer if the given coordinates are
- *             invalid, and thus can be used to check the validity of
- *             coordinates. Therefore, a UArray2 should not store NULL
- *             pointers if you wish to use this feature.
  */
 void *UArray2_at(UArray2_T arr, int col, int row)
 {
@@ -159,6 +155,7 @@ void *UArray2_at(UArray2_T arr, int col, int row)
                 index = UArray2_coords_to_index(arr, col, row);
                 return_val = UArray_at(arr->arry, index);
         EXCEPT(Bad_coords)
+                RAISE(Bad_coords);
                 return_val = NULL;
         END_TRY;
 
@@ -216,43 +213,6 @@ void UArray2_map_col_major(UArray2_T arr, void apply(int col, int row,
                 for (row = 0; row < arr->height; row++) {
                         apply(col, row, arr, UArray2_at(arr, col, row), cl);
                 }
-        }
-}
-
-/*
- * UArray2_map_regions
- *    Purpose: Runs the specified function on each element in a UArray2_T
- *             object. Traverses the array one 3x3 region at a time. The
- *             regions within the UArray2 are in column major order, but
- *             each region is internally traversed in row major order.
- * Parameters: The UArray2_T object, the function to be applied, and a
- *             void pointer to a closure argument.
- *    Returns: Nothing
- *    Expects: That the UArray2_T object is valid and that the apply function
- *             serves its own intended purpose and has parameters matching the
- *             UArray2_map_regions function prototype. Also expects that the
- *             closure argument is appropriate for the specified apply
- *             function (unchecked).
- */
-void UArray2_map_regions(UArray2_T arr, void apply(int col, int row,
-        UArray2_T arr, void *pt1, void *pt2), void *cl)
-{
-        if (arr == NULL) {
-                RAISE(Bad_array);
-        }
-        int col = 0, row = 0;
-        while (col < arr->width && row < arr->height) {
-                apply(col, row, arr, UArray2_at(arr, col, row), cl);
-                if ((col + 1) % 3 == 0) {
-                        if (row == arr->height - 1) {
-                                row = 0;
-                        }
-                        else {
-                                row++;
-                                col -=3;
-                        }
-                }
-                col++;
         }
 }
 
