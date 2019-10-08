@@ -16,6 +16,9 @@ files to the server. We hope the checked runtime errors have been
 implemented correctly, but we are not always sure whether we should catch
 an execption and keep the program going or if we should abort the program.
 
+For very long, narrow images, the dimensions are correct but the patterns
+are not always transformed correctly.
+
 ****************************** ARCHITECTURE ******************************
 
 ************************** PART E: EXPERIMENTAL **************************
