@@ -1,0 +1,24 @@
+**************************************************************************
+*                                PPMTRANS                                *
+*       BY CAMILLE CALABRESE (ccalab04) AND SOPHIA WANG (swang30)        *
+*                 OCTOBER 2019 FOR COMP 40 ASSIGNMENT 3                  *
+**************************************************************************
+
+**************************** ACKNOWLEDGEMENTS ****************************
+Thank you to Megan Monroe, who helped us during her office hours last week,
+and Josh Simani, who helped us understand the UArray methods interface.
+
+************************* IMPLEMENTATION SUCCESS *************************
+As far as we can tell, we have successfully implemented all of the
+transformations, including the optional ones. Any problems with our
+program output we had could be traced to an issue uploading large image
+files to the server. We hope the checked runtime errors have been
+implemented correctly, but we are not always sure whether we should catch
+an execption and keep the program going or if we should abort the program.
+
+****************************** ARCHITECTURE ******************************
+
+************************** PART E: EXPERIMENTAL **************************
+
+***************************** TIME COMMITMENT ****************************
+We spent roughly 20 hours on this assignment.
