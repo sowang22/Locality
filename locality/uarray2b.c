@@ -175,12 +175,23 @@ extern int UArray2b_blocksize(UArray2b_T array2b)
         return array2b->blocksize;
 }
 
-/* return a pointer to the cell in the given column and row.
- * index out of range is a checked run-time error
- *
+/*
+ * UArray2b_at
+ *    Purpose: Gets the element at the specified indices of the specified
+ *             array
+ * Parameters: A blocked 2D array and column and row coordinates for the
+ *             desired element
+ *    Returns: A void pointer to the specified element
+ *    Expects: That the coordinates are in bounds of the array and the array
+ *             is valid (especially that it is nonnull). Checked runtime
+ *             errors
  */
 extern void *UArray2b_at(UArray2b_T array2b, int col, int row)
 {
+        if (array2b == NULL) {
+                RAISE(invalid_input);
+                return NULL;
+        }
         if (coords_2D_to_1D(array2b, col, row) == -1) {
                 RAISE(invalid_input);
                 return NULL;
@@ -191,7 +202,17 @@ extern void *UArray2b_at(UArray2b_T array2b, int col, int row)
         }
 }
 
-/* visits every cell in one block before moving to another block */
+/*
+ * UArray2b_map
+ *    Purpose: Calls the specified function on each cell in a UArray2b. Visits
+ *             every cell in one block before moving to the next block.
+ * Parameters: A UArray2b, a function to apply to each cell, and a void
+ *             pointer to a closure argument
+ *    Returns: Nothing
+ *    Expects: That the UArray2b is valid, that the apply function works and
+ *             can be applied to the elements of the UArray2b, and that the
+ *             closure argument is appropriate to the apply function
+ */
 extern void  UArray2b_map(UArray2b_T array2b,
                           void apply(int col, int row, UArray2b_T array2b,
                                      void *elem, void *cl), void *cl)
@@ -210,7 +231,18 @@ extern void  UArray2b_map(UArray2b_T array2b,
         }
 }
 
-
+/*
+ * coords_2D_to_1D
+ *    Purpose: Converts column and row coordinate into one single index i,
+ *             which represents the location in the underlying UArray_T that
+ *             corresponds with the specified coordinates
+ * Parameters: A UArray2b and ints for the column and row coordinates
+ *    Returns: an integer for the one-dimensional index value
+ *    Expects: That the UArray2b is valid (checked runtime error)
+ *       NOTE: Does not necessarily expect that the coordinates are valid
+ *             because it can be used to check the validity of coordinates.
+ *             returns -1 if coordinates are out of bounds.
+ */
 /* Note: can be used to check if coordinates are valid. Returns -1 for
  * invalid coordinates */
 int coords_2D_to_1D(UArray2b_T arr, int col, int row)
