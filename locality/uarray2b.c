@@ -222,7 +222,6 @@ extern void *UArray2b_at(UArray2b_T array2b, int col, int row)
 
 /*
  * UArray2b_map
-<<<<<<< HEAD
  *    Purpose: Mapping function that maps through every element of the 2D
  *             blocked array; visits every cell in 1 block before moving to
  *             another block (block-major)
