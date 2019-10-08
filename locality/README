@@ -19,9 +19,11 @@ an execption and keep the program going or if we should abort the program.
 For very long, narrow images, the dimensions are correct but the patterns
 are not always transformed correctly.
 
-If we were to change one thing, we would add code to stop the program
+If we were to change something, we would add code to stop the program
 from entering the map function if the rotation is 0 degrees. Instead we
 would write the original image and then quit.
+
+We also would make block major transformations faster.
 
 ****************************** ARCHITECTURE ******************************
 
@@ -33,30 +35,52 @@ execution may have been too fast to give reliable results.
 For all of our tests, we piped the output to a .pnm image file and took
 the input from a .pnm file.
 
+Furthermore, all of our tests were run on landscape images, meaning the
+images were all wider than they were tall. For future tests, we would be
+interested to see what the results are for a portrait-oriented image and
+compare that to the results we got here.
+
+Our analysis follows, and the tables with our results are below.
+
+
+
+
+
+
+T = "Total"
+PP = "per pixel"
+
 __________________________________________________________________________
 |                           obama.pnm: 3108 x 2331                       |
 __________________________________________________________________________
-|                 | Col major      | row major      | block major        |
+|                 | Col major       | row major       | block major      |
 __________________________________________________________________________
-| 0 degrees       |
+| 0 degrees       | T : 390319916   | T : 336425081   | T : 788666876    |
+|                 | PP: 53.876258   | PP: 46.437099   | PP: 108.860498   |
 __________________________________________________________________________
-| 90 degrees      |
+| 90 degrees      | T : 412687276   | T : 375609347   | T : 829887584    |
+|                 | PP: 56.963648   | PP: 51.845744   | PP: 114.550235   |
 __________________________________________________________________________
-| 180 degrees     |
+| 180 degrees     | T : 470534849   | T : 413029880   | T : 879362646    |
+|                 | PP: 64.948408   | PP: 57.010938   | PP: 121.379328   |
 __________________________________________________________________________
-| 270 degrees     |
+| 270 degrees     | T : 486816322   | T : 476385599   | T : 930437301    |
+|                 | PP: 62.7195756  | PP: 65.755993   | PP: 128.429215   |
 __________________________________________________________________________
-| flip horizontal |
+| flip horizontal | T : 416840838   | T : 345066977   | T : 806801794    |
+|                 | PP: 57.536969   | PP: 47.629949   | PP: 111.363679   |
 __________________________________________________________________________
-| flip vertical   |
+| flip vertical   | T : 385879829   | T : 349102706   | T : 816029928    |
+|                 | PP: 53.263389   | PP: 48.187005   | PP: 112.637448   |
 __________________________________________________________________________
-| Transpose       |
+| transpose       | T : 403052583   | T : 364828224   | T : 822814859    |
+|                 | PP: 55.633762   | PP: 50.357614   | PP: 113.573979   |
 __________________________________________________________________________
 
 __________________________________________________________________________
 |                        mobo.pnm: 8160 x 6120                           |
 __________________________________________________________________________
-|                 | Col major      | row major      | block major        |
+|                 | Col major       | row major        | block major     |
 __________________________________________________________________________
 | 0 degrees       | T:3016308973    | T:2318113160   | T:5480941011
                   | PP:60.399625    | PP:46.418708   | PP:109.752279
