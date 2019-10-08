@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "assert.h"
+#include "except.h"
 #include "a2methods.h"
 #include "a2plain.h"
 #include "a2blocked.h"
@@ -38,6 +38,8 @@ struct transform_closure {
         struct Coordinates (*coords_calc)(int img_height, int img_width,
                                           int amount, struct Coordinates c);
 };
+
+Except_T invalid_parameter = {"Invalid Parameter"};
 
 void transform(int i, int j, A2 array, void *elemm, void *cl);
 A2 make_a2_out(int rotation, A2Methods_T methods, Pnm_ppm pic);
@@ -176,11 +178,11 @@ void transform(int i, int j, A2 array, void *elem, void *cl) {
         struct Coordinates new_coords = {i, j};
         struct Pnm_rgb *pixel = elem, *at_p;
         if (array == NULL || closure == NULL) {
-                RAISE(bad_parameter);
+                RAISE(invalid_parameter);
         }
         if (i < 0 || i >= closure->methods->width(array) ||
             j < 0 || j >= closure->methods->width(array)) {
-                    RAISE(bad_parameter);
+                    RAISE(invalid_parameter);
         }
 
         new_coords = closure->coords_calc(closure->methods->height(array),
@@ -190,7 +192,7 @@ void transform(int i, int j, A2 array, void *elem, void *cl) {
         at_p = closure->methods->at(closure->output, new_coords.col,
                                     new_coords.row);
         if (pixel == NULL || at_p == NULL) {
-                RAISE(bad_parameter);
+                RAISE(invalid_parameter);
         }
         *at_p = *pixel;
         return;
@@ -206,20 +208,26 @@ void transform(int i, int j, A2 array, void *elem, void *cl) {
  * Parameters: int rotation, A2Methods_T object, Pnm_ppm object
  *    Returns: A new A2 object with the new dimensions after the image has
  *             been transformed.
- *    Expects: int rotation must be a valid degree or code, A2Methods_T object
- *             cannot be NULL, and Pnm_ppm object also cannot be NULL
+ *    Expects: int rotation must be a valid degree or code (checked),
+ *             A2Methods_T object cannot be NULL (checked),
+ *             and Pnm_ppm object also cannot be NULL (checked)
  */
 A2 make_a2_out(int rotation, A2Methods_T methods, Pnm_ppm pic)
 {
+        if (methods == NULL || pic == NULL) {
+                RAISE(invalid_parameter);
+        }
         A2 result;
         if (rotation % 180 == 0 || rotation == 0 ||
             rotation == FLIP_HOR_CODE || rotation == FLIP_VER_CODE ) {
                 result = methods->new(pic->width, pic->height, sizeof(struct
                                       Pnm_rgb));
         }
-        else {
+        else if (rotation % 90 == 0 || rotation == TRANSPOSE_CODE) {
                 result = methods->new(pic->height, pic->width,
                                       sizeof(struct Pnm_rgb));
+        } else {
+                RAISE(invalid_parameter);
         }
         return result;
 }
@@ -230,11 +238,15 @@ A2 make_a2_out(int rotation, A2Methods_T methods, Pnm_ppm pic)
  *             based on the degrees it gets passed in or the code passed in
  * Parameters: Closure argument; in this case, a pointer to a struct
  *    Returns: Nothing
- *    Expects: The closure argument/struct is not NULL and the amount element
- *             of the struct must be a valid degree or flip code.
+ *    Expects: The closure argument/struct is valid (unchecked), not NULL
+ *             (checked), and the amount element of the struct must be a valid
+ *             degree or flip code (checked).
  */
 void assign_coords_calc(struct transform_closure *cl)
 {
+        if (cl == NULL) {
+                RAISE(invalid_parameter);
+        }
         // need a case to handle null/exception
         if (cl->amount == 0 || cl->amount % 90 == 0) {
                 cl->coords_calc = rotate_calc;
@@ -244,6 +256,8 @@ void assign_coords_calc(struct transform_closure *cl)
                 cl->coords_calc = flip_hor_calc;
         } else if (cl->amount == FLIP_VER_CODE) {
                 cl->coords_calc = flip_ver_calc;
+        } else {
+                RAISE(invalid_parameter);
         }
         return;
 }
