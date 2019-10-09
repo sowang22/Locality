@@ -5,7 +5,32 @@
  * By Camille Calabrese (ccalab04) and Sophia Wang (swang30)
  * October 2019 for Comp 40, HW3: Locality
  *
+ * The UArray2b relies on a one dimensional Hansen UArray_T. The coordinates
+ * translation functions maintain the arrangement of elements in the array.
+ * Blocks in the array are organized in a column major structure, but
+ * cells within a block are organized in a row major structure. For a
+ * UArray2b where width % blocksize != 0, there are unused cells which, as
+ * an invariant, will remain unused. The coordinates conversion fucntions
+ * maintain this invariant by indicating when a coordinate or index is out
+ * of bounds.
  *
+ * Invariants: Any column coordinate from 0 to width is accessible, and
+ *             any row coordinate from 0 to height is accessible. Other
+ *             coordinates are inaccessible. Real_width >= width and
+ *             real_height >= height. The length of the underlying
+ *             UArray_T equals real_width * real_height. The strip of
+ *             unused cells around the side of the uarray2b has a width
+ *             that's less than blocksize. All int members of the
+ *             UArray2b_T struct >= 1.
+
+ *             An especially important invariant is that, within a given
+ *             UArray2b, a given one-dimensional index will always be
+ *             translated into the same coordinate pair, and a two-dimensional
+ *             coordinate pair will always be translated into the same one-
+ *             dimensional index.
+ *
+ *             Another is that blocks of the UArray2b are stored
+ *             contiguously in memory.
  *************************************************************************/
 
 #include "uarray2b.h"

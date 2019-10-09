@@ -133,6 +133,8 @@ struct Coordinates coords_rotate_90(int img_height, struct Coordinates c)
  *    Returns: Struct with the new coordinates
  *    Expects: Parameter c (struct coordinates) cannot be NULL and both the
  *             width and height must be a valid number (not 0)
+ *
+ *       NOTE: Unused in ppmtrans
  */
 struct Coordinates coords_rotate_180(int img_height, int img_width,
                                      struct Coordinates c)
