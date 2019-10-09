@@ -27,6 +27,34 @@ We also would make block major transformations faster.
 
 ****************************** ARCHITECTURE ******************************
 
+Our solution offers two methods suites for UArray2, each of which
+corresponds to a different underlying data structure. The
+uarray2_methods_plain corresponds to a plain UArray2, whereas
+uarray2_methods_blocked works with blocked UArray2s. However, they are
+both of the same type and therefore offer essentially the same functions.
+
+A plain UArray2 is an unboxed, two dimensional array. The column coordinate
+always goes first, so the indices are effectively organized in column major
+order. The structure underlying a UArray2 is a single Hanson UArray_T, which
+is a one dimensional unboxed array. Whenever an array bucket needs to be
+accessed, a private function converts two dimensional coordinates into the
+corresponding one dimensional index in the Hanson array. It offers row major
+and column major mapping functions that use a simple nested loop for row and
+column coordinates.
+
+A UArray2b relies on the same underlying structure of a Hanson UArray_T,
+like the plain UArray2, but it works somewhat differently. It is organized
+into blocks, or square regions within the array. The main functional
+aspect that separates it from the plain UArray2 is the way coordinates
+are converted between one dimensional and two dimensional, and vice versa,
+to preserve the key invariant that array blocks are stored in contiguous
+sections of memory. Instead of offering row major or column major mapping
+functions, it offers its own block major mapping function which reflects the
+unique organization of the array elements. Although the methods in the
+blocked array are rather different in order to create the different
+organization of the array, the actual storage of the elements is still
+simply a one dimensional Hanson unboxed array.
+
 ************************** PART E: EXPERIMENTAL **************************
 One of our test images was a 501 x 625 image of Megan, but the program
 handled it so quickly we will not include the results here because the
