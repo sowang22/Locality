@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "except.h"
+#include "assert.h"
 #include "a2methods.h"
 #include "a2plain.h"
 #include "a2blocked.h"
@@ -40,6 +41,7 @@ struct transform_closure {
 };
 
 Except_T invalid_parameter = {"Invalid Parameter"};
+Except_T broken_interface  = {"Broken Interface"};
 
 void transform(int i, int j, A2 array, void *elemm, void *cl);
 A2 make_a2_out(int rotation, A2Methods_T methods, Pnm_ppm pic);
@@ -64,11 +66,15 @@ int main(int argc, char *argv[])
 
         /* default to UArray2 methods */
         A2Methods_T methods = uarray2_methods_plain;
-        assert(methods);
+        if (methods == NULL) {
+                RAISE(broken_interface);
+        }
 
         /* default to best map */
         A2Methods_mapfun *map = methods->map_default;
-        assert(map);
+        if (map == NULL) {
+                RAISE(broken_interface);
+        }
 
         for (i = 1; i < argc; i++) {
                 if (strcmp(argv[i], "-row-major") == 0) {
