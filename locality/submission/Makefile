@@ -71,8 +71,10 @@ ppmtrans: ppmtrans.o cputiming.o uarray2b.o uarray2.o a2plain.o a2blocked.o \
 	openfile.o coords_calcs.o
 	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
-testing: testingmain.o uarray2b.o
-	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
+# This executable was for unit testing only and is not part of our
+# submission
+#testing: testingmain.o uarray2b.o
+#	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
 
 
 clean:

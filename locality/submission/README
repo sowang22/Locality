@@ -5,19 +5,22 @@
 **************************************************************************
 
 **************************** ACKNOWLEDGEMENTS ****************************
+
 Thank you to Megan Monroe, who helped us during her office hours last week,
 and Josh Simani, who helped us understand the UArray methods interface.
 
+The UArray2 plain interface was originally written for the iii assignment,
+so it was written with the help of Andreas Moe (amoe01), Camille's hw2
+partner.
+
 ************************* IMPLEMENTATION SUCCESS *************************
+
 As far as we can tell, we have successfully implemented all of the
 transformations, including the optional ones. Any problems with our
 program output we had could be traced to an issue uploading large image
 files to the server. We hope the checked runtime errors have been
 implemented correctly, but we are not always sure whether we should catch
-an execption and keep the program going or if we should abort the program.
-
-For very long, narrow images, the dimensions are correct but the patterns
-are not always transformed correctly.
+an exception and keep the program going or if we should abort the program.
 
 If we were to change something, we would add code to stop the program
 from entering the map function if the rotation is 0 degrees. Instead we
@@ -55,7 +58,26 @@ blocked array are rather different in order to create the different
 organization of the array, the actual storage of the elements is still
 simply a one dimensional Hanson unboxed array.
 
+The architecture of ppmtrans relies mostly on the uarray2 methods and pnm
+interfaces. It identifies the transformation to be performed and calls the
+map function from the methods suite to perform it. The key feature of this
+program is the coords_calcs interface, which contains arithmetic functions
+for translating coordinates in different ways, such as rotations, tranposing,
+and flipping.
+
+A simple but crucial struct is Coordinates. It is used by a variety of
+functions in Uarray2b and ppmtrans to return both column and row coordinates
+in a simple way.
+
+Finally, one more niche structure is the transform_closure struct in ppmtrans.
+It is defined at the top of ppmtrans.c and simply allows the client to pass
+a lot of necessary information into the transform mapping function. One
+interesting thing about it is it contains a function pointer which points to
+one of the functions in coords_calcs, allowing the same "transform" function
+to be used for all kinds of transformations.
+
 ************************** PART E: EXPERIMENTAL **************************
+
 One of our test images was a 501 x 625 image of Megan, but the program
 handled it so quickly we will not include the results here because the
 execution may have been too fast to give reliable results.
@@ -220,4 +242,5 @@ the type of rotation. On the other hand, we were impressed that the time per
 pixel remained so consistent for any size image.
 
 ***************************** TIME COMMITMENT ****************************
+
 We spent roughly 20 hours on this assignment.

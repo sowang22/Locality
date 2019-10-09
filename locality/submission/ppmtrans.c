@@ -79,10 +79,10 @@ int main(int argc, char *argv[])
         for (i = 1; i < argc; i++) {
                 if (strcmp(argv[i], "-row-major") == 0) {
                         SET_METHODS(uarray2_methods_plain, map_row_major,
-				    "row-major");
+                                    "row-major");
                 } else if (strcmp(argv[i], "-col-major") == 0) {
                         SET_METHODS(uarray2_methods_plain, map_col_major,
-				    "column-major");
+                                    "column-major");
                 } else if (strcmp(argv[i], "-block-major") == 0) {
                         SET_METHODS(uarray2_methods_blocked, map_block_major,
                                     "block-major");
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
                         if (!(rotation == 0 || rotation == 90 ||
                             rotation == 180 || rotation == 270)) {
                                 fprintf(stderr,
-					"Rotation must be 0, 90, 180, or 270\n");
+                                    "Rotation must be 0, 90, 180, or 270\n");
                                 usage(argv[0]);
                         }
                         if (!(*endptr == '\0')) {    /* Not a number */
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
                         time_file_name = argv[++i];
                 } else if (*argv[i] == '-') {
                         fprintf(stderr, "%s: unknown option '%s'\n", argv[0],
-				argv[i]);
+                                argv[i]);
                 } else if (argc - i > 1) {
                         fprintf(stderr, "Too many arguments\n");
                         usage(argv[0]);
@@ -187,7 +187,7 @@ void transform(int i, int j, A2 array, void *elem, void *cl) {
                 RAISE(invalid_parameter);
         }
         if (i < 0 || i >= closure->methods->width(array) ||
-            j < 0 || j >= closure->methods->width(array)) {
+            j < 0 || j >= closure->methods->height(array)) {
                     RAISE(invalid_parameter);
         }
 
