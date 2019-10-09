@@ -31,8 +31,6 @@ struct Coordinates transpose_calc(int img_height, int img_width, int amount,
         (void) img_width;
         (void) amount;
 
-        assert(c != NULL);
-
         int aux = c.col;
         c.col = c.row;
         c.row = aux;
@@ -54,7 +52,6 @@ struct Coordinates flip_hor_calc(int img_height, int img_width, int amount,
 {
         (void) img_height;
         (void) amount;
-        assert(c != NULL);
         c.col = img_width - c.col - 1;
         return c;
 }
@@ -74,7 +71,6 @@ struct Coordinates flip_ver_calc(int img_height, int img_width, int amount,
 {
         (void) img_width;
         (void) amount;
-        assert(c != NULL);
         c.row = img_height - c.row - 1;
         return c;
 }
@@ -93,7 +89,6 @@ struct Coordinates flip_ver_calc(int img_height, int img_width, int amount,
 struct Coordinates rotate_calc(int img_height, int img_width, int amount,
                                struct Coordinates c)
 {
-        assert(c != NULL);
         if (!(amount % 90 == 0)) {
                 fprintf(stderr, "Rotation must be 0, 90, 180, or 270\n");
                 EXIT_FAILURE;
@@ -143,7 +138,6 @@ struct Coordinates coords_rotate_90(int img_height, struct Coordinates c)
 struct Coordinates coords_rotate_180(int img_height, int img_width,
                                      struct Coordinates c)
 {
-        assert(c != NULL);
         struct Coordinates results = {-1, -1};
         results.col = img_width  - c.col - 1;
         results.row = img_height - c.row - 1;
