@@ -14,7 +14,6 @@
  ***********************************************************************/
 
 #include "coords_calcs.h"
-#include "assert.h"
 
 /*
  * transpose_calc
