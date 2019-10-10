@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 {
         char *time_file_name = NULL, *img_file_name = NULL;
         FILE *image = NULL, *timer_out = NULL;
-        int   rotation       = -1;
+        int   rotation       = 0;
         int   i;
         CPUTime_T timer = NULL;
 

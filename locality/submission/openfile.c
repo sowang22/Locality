@@ -40,7 +40,8 @@ FILE *open_file(char *filename)
                 file = stdin;
         }
         if (file == NULL) {
-                RAISE(bad_input);
+                fprintf(stderr, "File could not be opened.\n");
+                exit(EXIT_FAILURE);
         }
         return file;
 }

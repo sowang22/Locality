@@ -90,7 +90,7 @@ struct Coordinates rotate_calc(int img_height, int img_width, int amount,
 {
         if (!(amount % 90 == 0)) {
                 fprintf(stderr, "Rotation must be 0, 90, 180, or 270\n");
-                EXIT_FAILURE;
+                exit(EXIT_FAILURE);
         }
         for (int i = 0; i < amount / 90; i++) {
                 if (i % 2 == 0) {
