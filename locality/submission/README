@@ -231,7 +231,8 @@ sometimes slower than the 90 degree rotation.
 
 Because the higher degree rotations aren't all that much slower than their
 lower degree counterparts, and all coordinates calculator functions are
-essentially just basic arithmetic operations, our guess is that the effect of
+essentially just basic arithmetic operations or, in the case of transpose,
+and even simpler coordinates swap, our guess is that the effect of
 the coordinate calculator functions, while noticeable, is small and is not
 the cause of the most serious speed bottleneck. This is reinforced by the
 fact that variance in the times for different mapping function is much more
