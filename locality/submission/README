@@ -22,6 +22,8 @@ files to the server. We hope the checked runtime errors have been
 implemented correctly, but we are not always sure whether we should catch
 an exception and keep the program going or if we should abort the program.
 
+One bug is that the program doesn't really work on image files named "-".
+
 If we were to change something, we would add code to stop the program
 from entering the map function if the rotation is 0 degrees. Instead we
 would write the original image and then quit.
@@ -241,6 +243,71 @@ We were also surprised that this held firm despite the size of the image or
 the type of rotation. On the other hand, we were impressed that the time per
 pixel remained so consistent for any size image.
 
+POSSIBLE EXPLANATIONS
+
+One possible explanation for why the block major mapping is so much slower
+could be that the map functions for the plain arrays both exhibit
+good locality, or locality isn't the most relevant factor in program speed.
+Then, since optimizing locality isn't much of an issue, the extra
+calculations that go into block major mapping slow the program down
+severely, causing it to be only half as fast as the other two mapping modes.
+
+What confused us the most was that row and column major had very similar
+performance, with row major actually being a bit faster. Since in C the
+spatial locality is better when the second index of a 2D array changes faster
+(even when the underlying structure is a 1D array, because this is the case
+in memory no matter what the code actually looks like), we had expected col
+major mapping to be much faster than row major. Therefore, one possible
+explanation is that the computer we tested on was simply so powerful that
+spatial locality in our program actually didn't matter too much. We feel we
+can rule out the idea of the entire image fitting in the cache at once because
+our tajmahal image is roughly 20 MB which certainly doesn't fit entirely in
+the cache. Therefore, our best idea so far is that locality simply wasn't
+the determining factor of speed in this program because some kind of
+processing in the CPU caused the speed bottleneck, rather than cache misses.
+This would explain why the measurements for row and col major are so similar
+to each other.
+
+This still doesn't account for the slight edge that row major had over
+column major. Although the Megan image was too small (and processed too
+quickly) for us to seriously consider, we did see column major performing
+slightly better than row major for that image, which inspired Sophia to come
+up with a theory that we have yet to test. Basically, Sophia's theory is
+that the difference between row major and column major speed depends on the
+orientation of the image. Since all of our test images were landscape
+oriented, row major was faster because rows were longer than columns. We
+don't really have the expertise to explain why this would make a difference,
+but it certainly is an intriguing hypothesis.
+
+Another theory to test would be to try this same program but on pbm images.
+We imagine a PBM image takes next to no processing power to manipulate,
+meaning the emphasis (and therefore the speed bottleneck) would be on the
+memory speed constraints associated with reading and writing the arrays.
+Then we could see if locality has more of an effect. Finally, another
+worthwhile experiment would be to time a larger swath of
+the program, including Pnm_ppmread and Pnm_ppmwrite, although we aren't so
+sure what this would tell us.
+
+Overall, we have guessed that the coordinates transformation calculators are
+not the greatest speed bottleneck, and neither is cache miss rate. The fact
+that block major is vastly slower whereas row and column major have similar
+speeds suggests that the source of the bottleneck is the functions to
+convert two dimensional coordinates to one dimensional. This function is much
+more complicated for the blocked array, which would explain the doubled
+time per pixel for this technique. It can't really explain the speed
+difference between row and column major, but it does explain the largest
+speed difference.
+
+In conclusion, we suspect that the speed bottleneck of this particular
+program pertains not to memory access but to processing power instead
+because the mapping form that involved more arithmetic operations (block
+major) was vastly slower than the other two, column major was slower than
+row major even though column major mapping exhibits better spatial locality
+(and none of the mapping formats exhibit particularly good temporal locality,
+especially for rotations). These things suggest that maximizing cache hits
+doesn't actually have a huge effect on the speed of this program because the
+speed bottleneck is caused by something else.
+
 ***************************** TIME COMMITMENT ****************************
 
-We spent roughly 20 hours on this assignment.
+We spent roughly 22 hours on this assignment.
