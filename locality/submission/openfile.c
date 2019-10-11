@@ -15,6 +15,7 @@
  *       * Added load_ppm
  ***********************************************************************/
 #include "openfile.h"
+#include <stdlib.h>
 
 /* Hanson exception for incorrect input*/
 Except_T bad_input = {"Bad Input"};
